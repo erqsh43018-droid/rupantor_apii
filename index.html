@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ERESH TOPUP</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Inter,Arial,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    color:#fff;
+    background:
+        radial-gradient(circle at 90% 0%,#174a7c 0%,transparent 30%),
+        radial-gradient(circle at 0% 70%,#102e51 0%,transparent 30%),
+        linear-gradient(145deg,#050d17,#091827);
+}
+
+button,
+input{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.header{
+    height:72px;
+    padding:0 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    position:sticky;
+    top:0;
+    z-index:20;
+
+    background:rgba(5,14,25,.72);
+    backdrop-filter:blur(22px);
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.logo{
+    font-size:21px;
+    font-weight:900;
+}
+
+.logo span{
+    color:#53adff;
+}
+
+.wallet-btn{
+    border:1px solid rgba(80,170,255,.3);
+    background:rgba(55,145,235,.14);
+    color:white;
+
+    padding:10px 15px;
+    border-radius:14px;
+
+    font-weight:700;
+}
+
+.wallet-btn:hover{
+    background:rgba(55,145,235,.25);
+}
+
+.container{
+    width:min(1050px,92%);
+    margin:28px auto 60px;
+}
+
+.hero{
+    padding:28px;
+
+    border-radius:25px;
+
+    border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.045);
+
+    box-shadow:0 20px 60px rgba(0,0,0,.15);
+}
+
+.hero small{
+    color:#5eb3ff;
+    font-weight:800;
+    letter-spacing:1px;
+}
+
+.hero h1{
+    margin-top:8px;
+    font-size:clamp(30px,6vw,45px);
+}
+
+.hero p{
+    margin-top:8px;
+    color:#91a6bb;
+}
+
+.section-title{
+    margin:28px 0 15px;
+}
+
+.section-title h2{
+    font-size:22px;
+}
+
+.section-title p{
+    margin-top:5px;
+    color:#8296aa;
+}
+
+.packages{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+}
+
+.package{
+    position:relative;
+
+    padding:20px;
+
+    border-radius:20px;
+
+    background:rgba(255,255,255,.045);
+    border:1px solid rgba(255,255,255,.08);
+
+    transition:.2s;
+}
+
+.package:hover{
+    transform:translateY(-3px);
+    border-color:rgba(82,173,255,.5);
+}
+
+.package.selected{
+    border-color:#54adff;
+    background:rgba(50,145,235,.14);
+
+    box-shadow:
+        0 0 0 1px rgba(84,173,255,.15),
+        0 12px 35px rgba(30,130,230,.12);
+}
+
+.diamond{
+    font-size:27px;
+}
+
+.package h3{
+    margin-top:9px;
+    font-size:19px;
+}
+
+.package .price{
+    margin-top:8px;
+    color:#65b5ff;
+    font-size:19px;
+    font-weight:900;
+}
+
+.buy-btn{
+    width:100%;
+    margin-top:20px;
+
+    padding:15px;
+
+    border:0;
+    border-radius:16px;
+
+    color:#fff;
+    background:linear-gradient(135deg,#2188e8,#50adff);
+
+    font-weight:900;
+
+    transition:.2s;
+}
+
+.buy-btn:hover{
+    transform:translateY(-1px);
+}
+
+.buy-btn:disabled{
+    opacity:.4;
+    cursor:not-allowed;
+}
+
+.status{
+    display:none;
+
+    margin-top:14px;
+    padding:13px 15px;
+
+    border-radius:14px;
+
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+
+    color:#c8d6e5;
+}
+
+.status.show{
+    display:block;
+}
+
+.status.error{
+    color:#ff8d8d;
+}
+
+.status.success{
+    color:#7fd0ff;
+}
+
+
+/* WALLET */
+
+.modal{
+    position:fixed;
+    inset:0;
+
+    display:none;
+    align-items:center;
+    justify-content:center;
+
+    padding:18px;
+
+    background:rgba(0,0,0,.68);
+    backdrop-filter:blur(12px);
+
+    z-index:100;
+}
+
+.modal.show{
+    display:flex;
+}
+
+.wallet-box{
+    width:min(430px,100%);
+
+    padding:24px;
+
+    border-radius:25px;
+
+    background:#0b1a2b;
+    border:1px solid rgba(255,255,255,.1);
+
+    box-shadow:0 30px 80px rgba(0,0,0,.4);
+}
+
+.wallet-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.wallet-head h2{
+    font-size:23px;
+}
+
+.close{
+    border:0;
+    background:none;
+    color:#9db0c4;
+
+    font-size:28px;
+}
+
+.balance-card{
+    margin:20px 0;
+
+    padding:22px;
+
+    border-radius:20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(40,140,235,.2),
+            rgba(40,100,180,.08)
+        );
+
+    border:1px solid rgba(80,170,255,.14);
+}
+
+.balance-card small{
+    color:#8fa5ba;
+}
+
+.balance-card strong{
+    display:block;
+
+    margin-top:7px;
+
+    font-size:31px;
+}
+
+.wallet-input{
+    width:100%;
+
+    padding:14px;
+
+    outline:none;
+
+    border-radius:14px;
+
+    border:1px solid rgba(255,255,255,.1);
+
+    background:#06111e;
+    color:white;
+}
+
+.wallet-input:focus{
+    border-color:#4daaff;
+}
+
+.add-btn{
+    width:100%;
+
+    margin-top:12px;
+
+    padding:14px;
+
+    border:0;
+    border-radius:14px;
+
+    background:#238ce9;
+    color:white;
+
+    font-weight:900;
+}
+
+.note{
+    margin-top:13px;
+    color:#70869d;
+    font-size:12px;
+    line-height:1.5;
+}
+
+
+/* RESULT */
+
+.result{
+    display:none;
+
+    margin-top:18px;
+    padding:18px;
+
+    border-radius:18px;
+
+    background:rgba(255,255,255,.045);
+    border:1px solid rgba(255,255,255,.08);
+}
+
+.result.show{
+    display:block;
+}
+
+.result h3{
+    margin-bottom:8px;
+}
+
+.result p{
+    color:#91a5ba;
+    line-height:1.6;
+}
+
+@media(max-width:700px){
+
+    .packages{
+        grid-template-columns:1fr 1fr;
+    }
+
+}
+
+@media(max-width:470px){
+
+    .header{
+        padding:0 13px;
+    }
+
+    .container{
+        width:94%;
+    }
+
+    .packages{
+        grid-template-columns:1fr;
+    }
+
+    .hero{
+        padding:22px;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+    <div class="logo">
+        ERESH <span>TOPUP</span>
+    </div>
+
+    <button
+        class="wallet-btn"
+        onclick="openWallet()"
+    >
+        Wallet
+    </button>
+
+</header>
+
+
+<main class="container">
+
+
+    <section class="hero">
+
+        <small>GAME TOPUP</small>
+
+        <h1>Free Fire</h1>
+
+        <p>
+            Select a UID Topup package and continue to payment.
+        </p>
+
+    </section>
+
+
+    <section>
+
+        <div class="section-title">
+
+            <h2>UID Topup</h2>
+
+            <p>
+                Choose your recharge package
+            </p>
+
+        </div>
+
+
+        <div class="packages">
+
+
+            <div
+                class="package"
+                onclick="selectPackage(this,'ff25')"
+            >
+
+                <div class="diamond">💎</div>
+
+                <h3>25 Diamonds</h3>
+
+                <div class="price">
+                    ৳20
+                </div>
+
+            </div>
+
+
+            <div
+                class="package"
+                onclick="selectPackage(this,'ff50')"
+            >
+
+                <div class="diamond">💎</div>
+
+                <h3>50 Diamonds</h3>
+
+                <div class="price">
+                    ৳45
+                </div>
+
+            </div>
+
+
+            <div
+                class="package"
+                onclick="selectPackage(this,'ff115')"
+            >
+
+                <div class="diamond">💎</div>
+
+                <h3>115 Diamonds</h3>
+
+                <div class="price">
+                    ৳75
+                </div>
+
+            </div>
+
+
+            <div
+                class="package"
+                onclick="selectPackage(this,'ff240')"
+            >
+
+                <div class="diamond">💎</div>
+
+                <h3>240 Diamonds</h3>
+
+                <div class="price">
+                    ৳150
+                </div>
+
+            </div>
+
+
+            <div
+                class="package"
+                onclick="selectPackage(this,'ff355')"
+            >
+
+                <div class="diamond">💎</div>
+
+                <h3>355 Diamonds</h3>
+
+                <div class="price">
+                    ৳220
+                </div>
+
+            </div>
+
+
+            <div
+                class="package"
+                onclick="selectPackage(this,'ff610')"
+            >
+
+                <div class="diamond">💎</div>
+
+                <h3>610 Diamonds</h3>
+
+                <div class="price">
+                    ৳350
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <button
+            id="buyBtn"
+            class="buy-btn"
+            disabled
+            onclick="buyNow()"
+        >
+            Select a Package
+        </button>
+
+
+        <div
+            id="status"
+            class="status"
+        ></div>
+
+
+        <div
+            id="result"
+            class="result"
+        ></div>
+
+
+    </section>
+
+
+</main>
+
+
+
+<!-- WALLET MODAL -->
+
+<div
+    id="walletModal"
+    class="modal"
+>
+
+    <div class="wallet-box">
+
+
+        <div class="wallet-head">
+
+            <h2>Wallet</h2>
+
+            <button
+                class="close"
+                onclick="closeWallet()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="balance-card">
+
+            <small>
+                Current Balance
+            </small>
+
+            <strong id="balance">
+                ৳0.00
+            </strong>
+
+        </div>
+
+
+        <input
+            id="addAmount"
+            class="wallet-input"
+            type="number"
+            min="1"
+            step="1"
+            placeholder="Enter amount"
+        >
+
+
+        <button
+            class="add-btn"
+            onclick="addMoney()"
+        >
+            Add Money
+        </button>
+
+
+        <div
+            id="walletStatus"
+            class="status"
+        ></div>
+
+
+        <div class="note">
+
+            Wallet balance is stored on Firebase.
+            The client cannot directly increase the balance.
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+<script type="module">
+
+
+/* =====================================
+   FIREBASE IMPORT
+===================================== */
+
+import {
+    initializeApp
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+
+import {
+    getAuth,
+    signInAnonymously,
+    onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+
+import {
+    getDatabase,
+    ref,
+    onValue
+}
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+
+
+
+/* =====================================
+   FIREBASE CONFIG
+===================================== */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyB_bblG8Nl9BiOO2FyyonG0b8jhnDWCAjU",
+
+    authDomain:
+        "testproject-de1bd.firebaseapp.com",
+
+    databaseURL:
+        "https://testproject-de1bd-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+    projectId:
+        "testproject-de1bd",
+
+    storageBucket:
+        "testproject-de1bd.firebasestorage.app",
+
+    messagingSenderId:
+        "100533871658",
+
+    appId:
+        "1:100533871658:web:a29546419d094d14098f53",
+
+    measurementId:
+        "G-TF6R0J8463"
+
+};
+
+
+
+const app =
+    initializeApp(firebaseConfig);
+
+
+const auth =
+    getAuth(app);
+
+
+const db =
+    getDatabase(app);
+
+
+
+let currentUser = null;
+
+let selectedProduct = null;
+
+
+
+/* =====================================
+   ANONYMOUS LOGIN
+===================================== */
+
+signInAnonymously(auth)
+
+.then(()=>{
+
+    console.log(
+        "Firebase anonymous login successful"
+    );
+
+})
+
+.catch(error=>{
+
+    console.error(
+        "Firebase Auth Error:",
+        error
+    );
+
+    showStatus(
+        "Firebase authentication failed: "
+        + error.code,
+        "error"
+    );
+
+});
+
+
+
+/* =====================================
+   AUTH STATE
+===================================== */
+
+onAuthStateChanged(
+    auth,
+    async user => {
+
+        if(!user){
+
+            return;
+
+        }
+
+
+        currentUser = user;
+
+
+        console.log(
+            "UID:",
+            user.uid
+        );
+
+
+        /*
+         * Make sure user exists
+         */
+
+        try{
+
+            const token =
+                await user.getIdToken();
+
+
+            await fetch(
+                "/api/init-user",
+                {
+
+                    method:"POST",
+
+                    headers:{
+                        "Authorization":
+                            "Bearer "+token
+                    }
+
+                }
+            );
+
+        }catch(error){
+
+            console.error(
+                "Init user error:",
+                error
+            );
+
+        }
+
+
+
+        /*
+         * Live balance
+         */
+
+        const balanceRef =
+            ref(
+                db,
+                "users/"
+                + user.uid
+                + "/balance"
+            );
+
+
+        onValue(
+            balanceRef,
+            snapshot => {
+
+                const amount =
+                    Number(
+                        snapshot.val() || 0
+                    );
+
+
+                document
+                    .getElementById("balance")
+                    .textContent =
+                    "৳"
+                    + amount.toFixed(2);
+
+            }
+        );
+
+    }
+);
+
+
+
+/* =====================================
+   SELECT PRODUCT
+===================================== */
+
+window.selectPackage =
+function(element,productId){
+
+    document
+        .querySelectorAll(".package")
+        .forEach(item => {
+
+            item.classList.remove(
+                "selected"
+            );
+
+        });
+
+
+    element.classList.add(
+        "selected"
+    );
+
+
+    selectedProduct =
+        productId;
+
+
+    const prices = {
+
+        ff25:20,
+        ff50:45,
+        ff115:75,
+        ff240:150,
+        ff355:220,
+        ff610:350
+
+    };
+
+
+    const btn =
+        document.getElementById(
+            "buyBtn"
+        );
+
+
+    btn.disabled = false;
+
+
+    btn.textContent =
+        "Buy Now — ৳"
+        + prices[productId];
+
+};
+
+
+
+/* =====================================
+   BUY NOW
+===================================== */
+
+window.buyNow =
+async function(){
+
+    if(!selectedProduct){
+
+        return;
+
+    }
+
+
+    if(!currentUser){
+
+        showStatus(
+            "Firebase login is not ready.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const token =
+            await currentUser.getIdToken();
+
+
+        showStatus(
+            "Creating payment...",
+            "success"
+        );
+
+
+        const response =
+            await fetch(
+                "/api/create-payment",
+                {
+
+                    method:"POST",
+
+                    headers:{
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer "+token
+
+                    },
+
+                    body:JSON.stringify({
+
+                        type:
+                            "free_fire_uid_topup",
+
+                        productId:
+                            selectedProduct
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error ||
+                "Payment creation failed"
+            );
+
+        }
+
+
+        if(!data.payment_url){
+
+            throw new Error(
+                "Payment URL not received."
+            );
+
+        }
+
+
+        window.location.href =
+            data.payment_url;
+
+
+    }catch(error){
+
+        console.error(error);
+
+
+        showStatus(
+            error.message,
+            "error"
+        );
+
+    }
+
+};
+
+
+
+/* =====================================
+   WALLET OPEN/CLOSE
+===================================== */
+
+window.openWallet =
+function(){
+
+    document
+        .getElementById("walletModal")
+        .classList.add("show");
+
+};
+
+
+window.closeWallet =
+function(){
+
+    document
+        .getElementById("walletModal")
+        .classList.remove("show");
+
+};
+
+
+
+/* =====================================
+   ADD MONEY
+===================================== */
+
+window.addMoney =
+async function(){
+
+    const input =
+        document.getElementById(
+            "addAmount"
+        );
+
+
+    const amount =
+        Number(input.value);
+
+
+    if(!Number.isFinite(amount)
+        || amount < 1){
+
+        showWalletStatus(
+            "Enter a valid amount.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(!currentUser){
+
+        showWalletStatus(
+            "Firebase login is not ready.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const token =
+            await currentUser.getIdToken();
+
+
+        showWalletStatus(
+            "Creating payment...",
+            "success"
+        );
+
+
+        const response =
+            await fetch(
+                "/api/create-payment",
+                {
+
+                    method:"POST",
+
+                    headers:{
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer "+token
+
+                    },
+
+                    body:JSON.stringify({
+
+                        type:
+                            "wallet_add_money",
+
+                        amount:
+                            amount
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error ||
+                "Payment creation failed"
+            );
+
+        }
+
+
+        if(!data.payment_url){
+
+            throw new Error(
+                "Payment URL not received."
+            );
+
+        }
+
+
+        window.location.href =
+            data.payment_url;
+
+
+    }catch(error){
+
+        console.error(error);
+
+
+        showWalletStatus(
+            error.message,
+            "error"
+        );
+
+    }
+
+};
+
+
+
+/* =====================================
+   STATUS
+===================================== */
+
+function showStatus(
+    message,
+    type
+){
+
+    const box =
+        document.getElementById(
+            "status"
+        );
+
+
+    box.textContent =
+        message;
+
+
+    box.className =
+        "status show "
+        + type;
+
+}
+
+
+
+function showWalletStatus(
+    message,
+    type
+){
+
+    const box =
+        document.getElementById(
+            "walletStatus"
+        );
+
+
+    box.textContent =
+        message;
+
+
+    box.className =
+        "status show "
+        + type;
+
+}
+
+
+
+/* =====================================
+   PAYMENT RETURN
+===================================== */
+
+async function handlePaymentReturn(){
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const payment =
+        params.get("payment");
+
+
+    const orderId =
+        params.get("orderId");
+
+
+    const transactionId =
+        params.get("transactionId");
+
+
+    if(!payment){
+
+        return;
+
+    }
+
+
+    if(payment === "cancel"){
+
+        showStatus(
+            "Payment cancelled.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(
+        payment !== "success"
+        || !orderId
+        || !transactionId
+    ){
+
+        return;
+
+    }
+
+
+    if(!currentUser){
+
+        showStatus(
+            "Waiting for Firebase...",
+            "success"
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        const token =
+            await currentUser.getIdToken();
+
+
+        showStatus(
+            "Verifying payment...",
+            "success"
+        );
+
+
+        const response =
+            await fetch(
+                "/api/verify-payment",
+                {
+
+                    method:"POST",
+
+                    headers:{
+
+                        "Content-Type":
+                            "application/json",
+
+                        "Authorization":
+                            "Bearer "+token
+
+                    },
+
+                    body:JSON.stringify({
+
+                        orderId:
+                            orderId,
+
+                        transactionId:
+                            transactionId
+
+                    })
+
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if(!response.ok){
+
+            throw new Error(
+                data.error ||
+                "Payment verification failed"
+            );
+
+        }
+
+
+        if(data.type === "wallet_add_money"){
+
+            showStatus(
+                "Payment successful! Wallet balance updated.",
+                "success"
+            );
+
+        }else{
+
+            showStatus(
+                "Payment successful! Tutorial order created.",
+                "success"
+            );
+
+        }
+
+
+        document
+            .getElementById("result")
+            .classList.add("show");
+
+
+        document
+            .getElementById("result")
+            .innerHTML = `
+
+                <h3>✓ Payment Successful</h3>
+
+                <p>
+                    Order ID:
+                    <strong>${escapeHtml(orderId)}</strong>
+                    <br>
+                    Transaction:
+                    <strong>${escapeHtml(transactionId)}</strong>
+                    <br>
+                    Status:
+                    <strong>COMPLETED</strong>
+                </p>
+
+            `;
+
+
+        /*
+         * Remove query parameters
+         */
+
+        window.history.replaceState(
+            {},
+            document.title,
+            window.location.pathname
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+
+        showStatus(
+            error.message,
+            "error"
+        );
+
+    }
+
+}
+
+
+
+function escapeHtml(value){
+
+    return String(value)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+
+/*
+ * Wait a little for Firebase auth,
+ * then check return URL.
+ */
+
+setTimeout(
+    handlePaymentReturn,
+    1200
+);
+
+
+</script>
+
+</body>
+</html>
